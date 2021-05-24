@@ -14,7 +14,7 @@
 	vcpkg integrate install
 8) 	Instalar Advanced Rest Client para pruebas (https://install.advancedrestclient.com/install)
 9)	****** IMPORTANTE ****** El web service corre el puerto 8080
-
+10) Los arboles se guardan en la DB  cuando se crean o aactualizan, y se recuperan cuando se inicia la aplicación. Continua con la numeración siguiente.
 
 
 
