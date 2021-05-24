@@ -13,11 +13,12 @@
 7)	Integrar con el VS2019
 	vcpkg integrate install
 8) 	Instalar Advanced Rest Client para pruebas (https://install.advancedrestclient.com/install)
+9)	****** IMPORTANTE ****** El web service corre el puerto 8080
 
 
 
 
-Pruebas del Web Service usando Advanced Rest Client|
+Pruebas del Web Service usando Advanced Rest Client:
 
 - Creo 2 Arboles 
 
