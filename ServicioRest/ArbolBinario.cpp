@@ -20,6 +20,11 @@ void ArbolBinario::destruir_arbol(nodo* hoja)
     }
 }
 
+/// <summary>
+/// Inserta el valor en el arbol (recursivo)
+/// </summary>
+/// <param name="key"></param>
+/// <param name="hoja"></param>
 void ArbolBinario::insertar(int key, nodo* hoja)
 {
     if (key < hoja->dato)
@@ -47,6 +52,13 @@ void ArbolBinario::insertar(int key, nodo* hoja)
         }
     }
 }
+
+/// <summary>
+/// busca el valor en el arbol (recursivo)
+/// </summary>
+/// <param name="key"></param>
+/// <param name="hoja"></param>
+/// <returns></returns>
 nodo* ArbolBinario::buscar(int key, nodo* hoja)
 {
     if (hoja != nullptr)
@@ -60,7 +72,10 @@ nodo* ArbolBinario::buscar(int key, nodo* hoja)
     }
     else return nullptr;
 }
-
+/// <summary>
+/// Inserta el valor en el arbol, si esta vacio lo crea
+/// </summary>
+/// <param name="key"></param>
 void ArbolBinario::insertar(int key)
 {
     if (root != nullptr)
@@ -73,16 +88,29 @@ void ArbolBinario::insertar(int key)
         root->derecha = nullptr;
     }
 }
-
+/// <summary>
+/// Busca el valor en el arbol
+/// </summary>
+/// <param name="key"></param>
+/// <returns></returns>
 nodo* ArbolBinario::buscar(int key)
 {
     return buscar(key, root);
 }
+
+/// <summary>
+/// Borra el arbol
+/// </summary>
 void ArbolBinario::destruir_arbol()
 {
     destruir_arbol(root);
 }
 
+/// <summary>
+/// Imprime en la consola el arbol
+/// </summary>
+/// <param name="hoja"></param>
+/// <param name="contador"></param>
 void ArbolBinario::mostrar()
 {
     int contador = 0;
@@ -103,6 +131,11 @@ void ArbolBinario::mostrar()
     }
 }
 
+/// <summary>
+/// Imprime en la consola el arbol(recursivo)
+/// </summary>
+/// <param name="hoja"></param>
+/// <param name="contador"></param>
 void ArbolBinario::mostrar(nodo* hoja, int contador)
 {
     if (hoja == nullptr)
@@ -121,16 +154,14 @@ void ArbolBinario::mostrar(nodo* hoja, int contador)
         mostrar(hoja->izquierda, contador + 1);
     }
 }
-/*
-int Arbol::CommonAncestor(int valor1, int valor2)
-{
 
-
-    return 0;
-}
-*/
-// Finds the path from root node to given root of the tree, Stores the
-// path in a vector path[], returns true if path exists otherwise false
+/// <summary>
+/// Retornna el path de busqueda en un vector, para poder buscar el commonancestor
+/// </summary>
+/// <param name="root"></param>
+/// <param name="path"></param>
+/// <param name="k"></param>
+/// <returns></returns>
 bool ArbolBinario::findPath(nodo* root, std::vector<int>& path, int k)
 {
     // base case
@@ -155,8 +186,13 @@ bool ArbolBinario::findPath(nodo* root, std::vector<int>& path, int k)
     return false;
 }
 
-// Returns LCA if node n1, n2 are present in the given binary tree,
-// otherwise return -1
+/// <summary>
+/// Retorna el CommonAncestor si valor1 y valor2 existen en el arbol
+/// sino retorna -1
+/// </summary>
+/// <param name="n1"></param>
+/// <param name="n2"></param>
+/// <returns></returns>
 int ArbolBinario::findLCA(int n1, int n2)
 {
     
