@@ -141,6 +141,7 @@
   <ItemGroup>
     <ClCompile Include="ArbolBinario.cpp" />
     <ClCompile Include="ServicioRest.cpp" />
+    <ClCompile Include="sqlite3.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ArbolBinario.h" />

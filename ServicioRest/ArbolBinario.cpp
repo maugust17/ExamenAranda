@@ -1,5 +1,7 @@
 #include "ArbolBinario.h"
 #include <iostream>
+#include <sstream>
+
 
 ArbolBinario::ArbolBinario()
 {
@@ -78,6 +80,9 @@ nodo* ArbolBinario::buscar(int key, nodo* hoja)
 /// <param name="key"></param>
 void ArbolBinario::insertar(int key)
 {
+    //Guardo en el vector el orden que se ingreso para serializar en la base
+    orden_ingreso.push_back(key);
+
     if (root != nullptr)
         insertar(key, root);
     else
@@ -212,5 +217,41 @@ int ArbolBinario::findLCA(int n1, int n2)
     return path1[i - 1];
 }
 
+/// <summary>
+/// Retorna un string con el orden en que seingresaron los elementos
+/// </summary>
+/// <returns></returns>
+std::string ArbolBinario::Serialize()
+{
+    std::string salida;
+    for (int i = 0; i < orden_ingreso.size(); i++)
+    {
+        salida.append(std::to_string(orden_ingreso[i]));
+        if (i < orden_ingreso.size() - 1)
+            salida.append(";");
+    }
+    
+    return salida;
+}
 
+/// <summary>
+/// Levanta el orden de ingreso de los elementos y regenra el arbol
+/// </summary>
+/// <returns></returns>
+ArbolBinario* ArbolBinario::Deserialize(std::string serialize)
+{
+    
+    ArbolBinario* arbol = new ArbolBinario();
 
+    std::stringstream mm(serialize);
+    std::string s;
+    while (std::getline(mm, s, ';')) 
+    {
+        std::cout << s << std::endl;
+        //strings.push_back(s);
+        arbol->insertar(std::stoi(s));
+    }
+    std::cout << "--------------------" << std::endl;
+    
+    return arbol;
+}

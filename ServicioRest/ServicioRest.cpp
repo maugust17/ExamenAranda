@@ -4,11 +4,117 @@
 #include <cpprest/http_listener.h>
 #include <cpprest/asyncrt_utils.h>
 #include "ArbolBinario.h"
+#include "sqlite3.h"
+
+
 
 using namespace web;
 using namespace http;
 using namespace utility;
 using namespace http::experimental::listener;
+
+std::vector<ArbolBinario*> listaArboles;
+int contador;
+sqlite3* DB = nullptr;
+void crear_db()
+{
+
+	std::string sql = "CREATE TABLE arbol("
+		"ID INT PRIMARY KEY     NOT NULL, "
+		"ORDEN          TEXT    NOT NULL);";
+	int exit = 0;
+	exit = sqlite3_open("aranda.db", &DB);
+	char* messaggeError;
+	exit = sqlite3_exec(DB, sql.c_str(), NULL, 0, &messaggeError);
+
+	if (exit != SQLITE_OK)
+	{
+		//Puede ser porque existe, revisar el error
+		// 
+		//std::cerr << "Error Create Table" << std::endl;
+		//sqlite3_free(messaggeError);
+	}
+	else
+		std::cout << "Tabla creada exitosamente" << std::endl;
+	//
+}
+void cerrar_db()
+{
+	sqlite3_close(DB);
+}
+void insertar_o_actualizar(int id, std::string texto)
+{
+
+	char* messaggeError;
+	
+	/*std::string select("SELECT 1 FROM arbol");
+	int exit = sqlite3_exec(DB, select.c_str(), NULL, 0, &messaggeError);
+	if (exit != SQLITE_OK) {
+		std::cerr << "Error Insert" << std::endl;
+		sqlite3_free(messaggeError);
+	}
+	else
+		std::cout << "Records created Successfully!" << std::endl;
+		*/
+	std::string sql("INSERT INTO arbol VALUES(" + std::to_string(id) + " ,'" + texto + "');");
+	int exit = sqlite3_exec(DB, sql.c_str(), NULL, 0, &messaggeError);
+	if (exit != SQLITE_OK) {
+		std::cerr << "Error Insert" << std::endl;
+		sqlite3_free(messaggeError);
+
+		std::string update("UPDATE arbol SET orden = '" + texto + "' WHERE ID = " + std::to_string(id) + ";");
+		int exit = sqlite3_exec(DB, update.c_str(), NULL, 0, &messaggeError);
+		if (exit != SQLITE_OK) {
+			std::cerr << "Error Update" << std::endl;
+			sqlite3_free(messaggeError);
+
+
+		}
+		else
+		{
+			std::cout << "Records updated Successfully!" << std::endl;
+
+		}
+
+	}
+	else
+		std::cout << "Records created Successfully!" << std::endl;
+
+}
+
+static int callback(void* data, int argc, char** argv, char** azColName)
+{
+	
+	
+	
+	if (argc == 2)
+	{
+
+		ArbolBinario* arbol = ArbolBinario::Deserialize(argv[1]);
+
+		listaArboles.push_back(arbol);
+		contador++;
+
+	}
+
+	
+	return 0;
+}
+void recuperar_arboles()
+{ 
+	std::string data("CALLBACK FUNCTION");
+	std::string sql("SELECT * FROM arbol;");
+	
+	int rc = sqlite3_exec(DB, sql.c_str(), callback, (void*)data.c_str(), NULL);
+
+	if (rc != SQLITE_OK)
+		ucerr << "Error SELECT" << std::endl;
+	else {
+		ucout << "Operation OK!" << std::endl;
+	}
+}
+
+
 
 class CommandHandler
 {
@@ -23,8 +129,7 @@ private:
 	void handle_post(http_request message);
 	void handle_put(http_request message);
 	http_listener m_listener;
-	std::vector<ArbolBinario *> listaArboles;
-	int contador;
+	
 };
 CommandHandler::~CommandHandler()
 {
@@ -33,8 +138,9 @@ CommandHandler::~CommandHandler()
 
 CommandHandler::CommandHandler(utility::string_t url) : m_listener(url)
 {
-	contador = 0;
+	//contador = 0;
 
+	recuperar_arboles();
 	m_listener.support(methods::GET, std::bind(&CommandHandler::handle_get, this, std::placeholders::_1));
 	m_listener.support(methods::POST, std::bind(&CommandHandler::handle_post, this, std::placeholders::_1));
 	m_listener.support(methods::PUT, std::bind(&CommandHandler::handle_put, this, std::placeholders::_1));
@@ -97,6 +203,8 @@ void CommandHandler::handle_get(http_request message)
 				//arbol->mostrar();
 
 				message.reply(status_codes::OK, arbol->findLCA(valor1, valor2));
+
+				
 			}
 			else
 			{
@@ -160,6 +268,8 @@ void CommandHandler::handle_post(http_request message)
 				arbol->insertar(valor);
 
 				message.reply(status_codes::OK);
+
+				insertar_o_actualizar(id, arbol->Serialize());
 			}
 			else
 			{
@@ -197,6 +307,8 @@ void CommandHandler::handle_put(http_request message)
 		
 		//Genero un nuevo arbol y envío ID de vuelta
 		message.reply(status_codes::OK, contador);
+		//Lo grabo en la DB
+		insertar_o_actualizar(contador, "");
 	}
 	else
 	{
@@ -210,6 +322,11 @@ int main(int argc, char argv[])
 {
 	try
 	{
+		crear_db();
+
+		//recuperar_arboles();
+
+		ucout << "Recupero Arboles" << std::endl;
 		//Para crear el servicio REST uso CPPRESTSDK, instalado desde vcpkg(en el Readme se indica como instalar)
 		//Escucho en el puerto 8080
 		utility::string_t address = U("http://*:8080/");
@@ -234,5 +351,7 @@ int main(int argc, char argv[])
 		std::string line;
 		std::getline(std::cin, line);
 	}
+
+	cerrar_db();
 	return 0;
 }
